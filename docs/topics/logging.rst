@@ -149,6 +149,7 @@ These settings can be used to configure the logging:
 * :setting:`LOG_LEVEL`
 * :setting:`LOG_FORMAT`
 * :setting:`LOG_DATEFORMAT`
+* :setting:`LOG_DISPLAY_TOP_LEVEL_ONLY`
 * :setting:`LOG_STDOUT`
 
 First couple of settings define a destination for log messages. If
@@ -161,6 +162,9 @@ messages will be displayed on the standard error. Lastly, if
 :setting:`LOG_LEVEL` determines the minimum level of severity to display, those
 messages with lower severity will be filtered out. It ranges through the
 possible levels listed in :ref:`topics-logging-levels`.
+:setting:`LOG_DISPLAY_TOP_LEVEL_ONLY` determines if the path of log file is to be
+displayed. If set to ``False`` then a full path of log file is shown otherwise
+root level is displayed.
 
 :setting:`LOG_FORMAT` and :setting:`LOG_DATEFORMAT` specify formatting strings
 used as layouts for all messages. Those strings can contain any placeholders

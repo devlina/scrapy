@@ -665,7 +665,17 @@ directives.
 
 .. _Python datetime documentation: https://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior
 
-.. setting:: LOG_LEVEL
+.. setting:: LOG_DISPLAY_TOP_LEVEL_ONLY
+
+LOG_DISPLAY_TOP_LEVEL_ONLY
+--------------------------
+
+Default: ``True``
+
+Whether to show full directory path when displaying log.
+Otherwise, show top(root) only.
+
+.. setting:: LOG_ENCODING
 
 LOG_LEVEL
 ---------
