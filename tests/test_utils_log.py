@@ -3,13 +3,16 @@ from __future__ import print_function
 import sys
 import logging
 import unittest
+import mock
 
 from testfixtures import LogCapture
+from testfixtures import Comparison as C, compare
 from twisted.python.failure import Failure
 
 from scrapy.utils.log import (failure_to_exc_info, TopLevelFormatter,
-                              LogCounterHandler, StreamLogger)
+                              LogCounterHandler, StreamLogger, _get_handler)
 from scrapy.utils.test import get_crawler
+from scrapy.settings import Settings
 
 
 class FailureToExcInfoTest(unittest.TestCase):
@@ -60,6 +63,63 @@ class TopLevelFormatterTest(unittest.TestCase):
             logger.warning('test log msg')
 
         l.check(('different', 'WARNING', 'test log msg'))
+
+
+class gethandlerTest(unittest.TestCase):
+
+    def setUp(self):
+        self.logger = logging.getLogger()
+        self.orig_handlers = self.logger.handlers
+        self.logger.handlers = []
+        self.level = self.logger.level
+        self.settings_dict_1 = {
+            'LOG_ENABLED': 1,
+            'LOG_LEVEL': 'INFO',
+            'LOG_DISPLAY_TOP_LEVEL_ONLY': 1,
+            'LOG_FILE': 0,
+            'LOG_FORMAT': '%(asctime)s [%(name)s] %(levelname)s: %(message)s',
+            'LOG_DATEFORMAT': '%Y-%m-%d %H:%M:%S',
+        }
+        self.settings_dict_2 = {
+            'LOG_ENABLED': 1,
+            'LOG_LEVEL': 'INFO',
+            'LOG_DISPLAY_TOP_LEVEL_ONLY': 0,
+            'LOG_FILE': 0,
+            'LOG_FORMAT': '%(asctime)s [%(name)s] %(levelname)s: %(message)s',
+            'LOG_DATEFORMAT': '%Y-%m-%d %H:%M:%S',
+        }
+
+    def tearDown(self):
+        self.logger.handlers = self.orig_handlers
+        self.logger.level = self.level
+
+    # def test_get_handler(self):
+    #     settings = Settings(self.settings_dict_1)
+    #     handler =  _get_handler(settings)
+    #     self.logger.addHandler(handler)
+    #     compare([
+    #         C('logging.StreamHandler',
+    #           filter = C('logging.Filter',
+    #                      name='TopLevelFormatter',
+    #                      strict = False),
+    #           strict=False)
+    #         ], self.logger.handlers)
+
+
+    @mock.patch('logging.StreamHandler')
+    def test_get_handler(self, mockHandler):
+        settings = Settings(self.settings_dict_1)
+        _get_handler(settings)
+        self.assertTrue(mockHandler.addFilter.called)
+        #handler.addFilter = mock.MagicMock()
+        #TopLevelFormatter = mock.MagicMock()
+        #self.assertTrue(TopLevelFormatter.called)
+        #TopLevelFormatter.assert_called_with(['Scrapy'])
+        #mockStream.addFilter.assert_called_with(TopLevelFormatter(['scrapy']))
+        settings = Settings(self.settings_dict_2)
+        _get_handler(settings)
+        self.assertFalse(mockaddFilter.called)
+
 
 
 class LogCounterHandlerTest(unittest.TestCase):
